@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using SignalIrBasicChat.Models;
 
 namespace SignalIrBasicChat.Services
@@ -12,14 +13,21 @@ namespace SignalIrBasicChat.Services
             this.mContext = mContext;
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<List<User>> GetVerifiedUsers()
         {
-            return await this.mContext.Users.FromSql($"EXEC dbo.GetVerifiedUsers").ToListAsync();
+            return await this.mContext.Users.Where(user => user.bVerifiedEmail == true).ToListAsync();
+        }
+
+        public async Task CreateUser(string Username, string Password, string Email)
+        {
+            await this.mContext.Database
+                .ExecuteSqlAsync($"EXEC dbo.GSCreateUsersWithNonDuplicatedUsernames {Username}, {Password}, {Email}");
         }
     }
 
     public interface IUsers
     {
-        Task<List<User>> GetUsers();
+        Task CreateUser(string Username, string Password, string Email);
+        Task<List<User>> GetVerifiedUsers();
     }
 }
