@@ -15,17 +15,30 @@ namespace SignalIrBasicChat.Controllers
             this.mUserService = mUserService;
         }
 
-        [HttpGet]
-        public async Task<List<User>> GetUsers()
-        {
-            return await mUserService.GetVerifiedUsers();
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto Userdto)
         {
             await this.mUserService.CreateUser(Userdto.Username, Userdto.Password, Userdto.Email);
             return Ok("User Created");
+        }
+
+        [HttpGet("all")]
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await mUserService.GetAllUsers();
+        }
+
+        [HttpGet]
+        public async Task<List<User>> GetVerifiedUsers()
+        {
+            return await mUserService.GetVerifiedUsers();
+        }
+
+        [HttpDelete("{nUserId}")]
+        public async Task<IActionResult> DeleteUserById(int nUserId)
+        {
+            await this.mUserService.DeleteUserById(nUserId);
+            return Ok();
         }
     }
 }
